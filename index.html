@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>CIPHER — Market Data</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>CIPHER — Institutional Crypto Intelligence</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,300;9..144,400;9..144,600;9..144,900&family=JetBrains+Mono:wght@300;400;500;700&display=swap" rel="stylesheet">
@@ -13,13 +13,18 @@
     --ink:#eae6dc;
     --dim:#8a877e;
     --line:#1c1f1d;
-    --line2:#262a27;
     --acid:#c9ff3b;
     --blood:#ff4d2e;
+    --sky:#7fb4ff;
+    --paper:#f3efe4;
   }
   *{box-sizing:border-box;margin:0;padding:0}
   html,body{background:var(--bg);color:var(--ink);font-family:"Fraunces",serif;font-weight:300;-webkit-font-smoothing:antialiased}
-  body{min-height:100vh;padding:32px;overflow-x:hidden}
+  body{overflow-x:hidden}
+  a{color:inherit;text-decoration:none}
+  .mono{font-family:"JetBrains Mono",monospace;font-weight:400}
+  .up{color:var(--acid)}
+  .dn{color:var(--blood)}
 
   body::before{
     content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
@@ -27,362 +32,514 @@
       linear-gradient(var(--line) 1px,transparent 1px),
       linear-gradient(90deg,var(--line) 1px,transparent 1px);
     background-size:88px 88px;
-    mask-image:radial-gradient(ellipse at 50% 20%,#000 10%,transparent 70%);
+    mask-image:radial-gradient(ellipse at 60% 30%,#000 20%,transparent 75%);
   }
   body::after{
-    content:"";position:fixed;inset:0;pointer-events:none;z-index:0;
-    background:radial-gradient(1200px 700px at 80% 0%,rgba(201,255,59,.06),transparent 60%);
+    content:"";position:fixed;inset:0;pointer-events:none;z-index:1;
+    background:radial-gradient(1200px 700px at 85% -10%,rgba(201,255,59,.08),transparent 60%),
+               radial-gradient(900px 600px at 10% 110%,rgba(127,180,255,.06),transparent 60%);
   }
-  main{position:relative;z-index:1;max-width:1280px;margin:0 auto}
 
-  header{display:flex;justify-content:space-between;align-items:flex-end;padding-bottom:28px;border-bottom:1px solid var(--line);margin-bottom:40px;flex-wrap:wrap;gap:20px}
-  .brand{display:flex;align-items:center;gap:14px}
-  .mark{width:26px;height:26px;border:1.5px solid var(--acid);transform:rotate(45deg);position:relative}
-  .mark::after{content:"";position:absolute;inset:4px;background:var(--acid)}
-  .wordmark{font-family:"Fraunces",serif;font-weight:900;font-size:32px;letter-spacing:-.02em}
-  .wordmark span{color:var(--acid)}
-  .tagline{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.18em;margin-top:6px}
+  .grain{position:fixed;inset:0;pointer-events:none;z-index:2;opacity:.06;mix-blend-mode:overlay;
+    background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2'/></filter><rect width='100%25' height='100%25' filter='url(%23n)'/></svg>");}
 
-  .status{display:flex;gap:28px;align-items:center;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;flex-wrap:wrap}
-  .dot{display:inline-block;width:8px;height:8px;border-radius:50%;background:var(--acid);box-shadow:0 0 12px var(--acid);animation:blink 2s infinite;margin-right:8px;vertical-align:middle}
+  main,header,footer,section{position:relative;z-index:3}
+
+  .status{display:flex;justify-content:space-between;align-items:center;padding:14px 32px;border-bottom:1px solid var(--line);font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim)}
+  .status .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--acid);box-shadow:0 0 12px var(--acid);margin-right:8px;animation:blink 2s infinite}
   @keyframes blink{50%{opacity:.35}}
-  .status b{color:var(--ink);font-weight:500}
 
-  .title{margin-bottom:36px}
-  h1{font-family:"Fraunces",serif;font-weight:300;font-size:clamp(48px,7vw,96px);line-height:.92;letter-spacing:-.035em}
-  h1 em{font-style:italic;font-weight:900;color:var(--acid)}
-  .sub{margin-top:14px;color:var(--dim);font-size:16px;max-width:60ch;line-height:1.5}
+  .ticker{border-bottom:1px solid var(--line);overflow:hidden;white-space:nowrap;padding:10px 0;font-family:"JetBrains Mono",monospace;font-size:12px;letter-spacing:.05em}
+  .ticker-track{display:inline-block;animation:slide 60s linear infinite;padding-left:100%}
+  .ticker span{margin:0 28px;color:var(--dim)}
+  .ticker b{color:var(--ink);font-weight:500}
+  @keyframes slide{to{transform:translateX(-100%)}}
 
-  .summary{display:grid;grid-template-columns:repeat(4,1fr);gap:0;border:1px solid var(--line);margin-bottom:40px}
-  .sumcell{padding:24px 28px;border-right:1px solid var(--line)}
-  .sumcell:last-child{border-right:none}
-  .sumcell .lbl{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.15em;margin-bottom:10px}
-  .sumcell .val{font-family:"Fraunces",serif;font-size:30px;font-weight:300;letter-spacing:-.02em;line-height:1}
-  .sumcell .delta{font-family:"JetBrains Mono",monospace;font-size:11px;margin-top:8px}
+  nav{display:flex;justify-content:space-between;align-items:center;padding:28px 32px;border-bottom:1px solid var(--line)}
+  .logo{font-family:"Fraunces",serif;font-weight:900;font-size:26px;letter-spacing:-.02em;display:flex;align-items:center;gap:10px}
+  .logo .mark{width:22px;height:22px;border:1.5px solid var(--acid);transform:rotate(45deg);position:relative}
+  .logo .mark::after{content:"";position:absolute;inset:3px;background:var(--acid)}
+  nav ul{display:flex;gap:36px;list-style:none;font-family:"JetBrains Mono",monospace;font-size:12px;text-transform:uppercase;letter-spacing:.12em;color:var(--dim)}
+  nav ul a:hover{color:var(--acid)}
+  .cta{font-family:"JetBrains Mono",monospace;font-size:12px;text-transform:uppercase;letter-spacing:.12em;padding:12px 22px;border:1px solid var(--ink);background:transparent;color:var(--ink);cursor:pointer;transition:.25s}
+  .cta:hover{background:var(--acid);color:#000;border-color:var(--acid)}
 
-  .table-wrap{border:1px solid var(--line);overflow:hidden;background:rgba(255,255,255,.005)}
-  table{width:100%;border-collapse:collapse;font-family:"JetBrains Mono",monospace;font-size:13px}
-  thead{background:rgba(201,255,59,.03);border-bottom:1px solid var(--line)}
-  th{padding:16px 20px;text-align:left;font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.15em;color:var(--dim)}
-  th.num{text-align:right}
-  tbody tr{border-bottom:1px solid var(--line);transition:background .2s}
-  tbody tr:last-child{border-bottom:none}
-  tbody tr:hover{background:rgba(201,255,59,.03)}
-  td{padding:22px 20px;vertical-align:middle}
-  td.num{text-align:right;font-variant-numeric:tabular-nums}
-  .rank{color:var(--dim);font-size:11px;width:40px}
-  .asset{display:flex;align-items:center;gap:14px}
-  .coin-ico{width:34px;height:34px;border:1px solid var(--line2);border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:"Fraunces",serif;font-weight:900;font-size:14px;color:var(--acid);background:rgba(201,255,59,.04)}
-  .asset .sym{font-family:"Fraunces",serif;font-size:19px;font-weight:400;color:var(--ink);letter-spacing:-.01em;display:block}
-  .asset .name{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;margin-top:2px;display:block}
-  .px{font-size:16px;color:var(--ink)}
-  .ch{font-size:13px;padding:4px 10px;border-radius:2px;display:inline-block;min-width:80px;text-align:center}
-  .up{color:var(--acid);background:rgba(201,255,59,.08)}
-  .dn{color:var(--blood);background:rgba(255,77,46,.08)}
-  .vol,.cap{color:var(--dim);font-size:12px}
-  .spark{width:110px;height:32px}
-  .spark path{fill:none;stroke-width:1.3}
+  .hero{display:grid;grid-template-columns:1.25fr .9fr;gap:0;border-bottom:1px solid var(--line);min-height:78vh}
+  .hero-left{padding:80px 48px 60px 32px;display:flex;flex-direction:column;justify-content:space-between;border-right:1px solid var(--line);position:relative}
+  .eyebrow{font-family:"JetBrains Mono",monospace;font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--acid);margin-bottom:32px;display:flex;align-items:center;gap:12px}
+  .eyebrow::before{content:"";width:38px;height:1px;background:var(--acid)}
+  h1{font-size:clamp(56px,8.2vw,142px);line-height:.92;letter-spacing:-.035em;font-weight:300;font-family:"Fraunces",serif}
+  h1 em{font-style:italic;font-weight:900;background:linear-gradient(180deg,var(--ink) 0%,var(--ink) 55%,var(--acid) 55%,var(--acid) 100%);-webkit-background-clip:text;background-clip:text;color:transparent;padding:0 .05em}
+  h1 .stroke{-webkit-text-stroke:1.5px var(--ink);color:transparent;font-weight:900}
+  .lede{max-width:520px;margin-top:38px;font-size:18px;line-height:1.55;color:var(--dim);font-family:"Fraunces",serif}
+  .lede b{color:var(--ink);font-weight:400}
+  .hero-actions{margin-top:46px;display:flex;gap:14px;align-items:center}
+  .cta-primary{padding:16px 28px;background:var(--acid);color:#000;border:none;font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.1em;text-transform:uppercase;cursor:pointer;transition:.2s;font-weight:500}
+  .cta-primary:hover{transform:translate(-3px,-3px);box-shadow:6px 6px 0 var(--ink)}
+  .cta-ghost{padding:16px 22px;color:var(--dim);font-family:"JetBrains Mono",monospace;font-size:13px;text-transform:uppercase;letter-spacing:.1em;border-bottom:1px solid var(--line)}
+  .cta-ghost:hover{color:var(--ink)}
 
-  .state{padding:80px 40px;text-align:center;color:var(--dim);font-family:"JetBrains Mono",monospace;font-size:13px;letter-spacing:.05em}
-  .state .spinner{display:inline-block;width:16px;height:16px;border:1.5px solid var(--line);border-top-color:var(--acid);border-radius:50%;animation:spin 1s linear infinite;margin-right:12px;vertical-align:middle}
-  @keyframes spin{to{transform:rotate(360deg)}}
-  .state.err{color:var(--blood)}
+  .hero-footnote{display:flex;gap:48px;margin-top:64px;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em}
+  .hero-footnote div b{display:block;color:var(--ink);font-size:28px;font-family:"Fraunces",serif;font-weight:300;text-transform:none;letter-spacing:-.02em;margin-bottom:4px}
 
-  footer{margin-top:48px;padding-top:28px;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.15em;flex-wrap:wrap;gap:12px}
+  .terminal{padding:48px 40px;position:relative;display:flex;flex-direction:column;gap:20px;background:
+    linear-gradient(180deg,rgba(201,255,59,.02),transparent 40%)}
+  .term-head{display:flex;justify-content:space-between;font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em;padding-bottom:14px;border-bottom:1px dashed var(--line)}
+  .coin{display:flex;justify-content:space-between;align-items:baseline;padding:14px 0;border-bottom:1px solid var(--line)}
+  .coin .sym{font-family:"Fraunces",serif;font-weight:600;font-size:22px;letter-spacing:-.01em}
+  .coin .name{font-family:"JetBrains Mono",monospace;font-size:10px;text-transform:uppercase;color:var(--dim);margin-left:10px;letter-spacing:.12em}
+  .coin .px{font-family:"JetBrains Mono",monospace;font-size:16px}
+  .coin .ch{font-family:"JetBrains Mono",monospace;font-size:11px;margin-left:12px}
+  .chart{height:170px;margin-top:10px;position:relative}
+  .chart svg{width:100%;height:100%;overflow:visible}
+  .chart .line{fill:none;stroke:var(--acid);stroke-width:1.5;stroke-dasharray:1200;stroke-dashoffset:1200;animation:draw 2.8s ease .4s forwards}
+  .chart .area{fill:url(#g);opacity:0;animation:fade 1.6s ease 2s forwards}
+  @keyframes draw{to{stroke-dashoffset:0}}
+  @keyframes fade{to{opacity:.25}}
+  .term-foot{display:flex;justify-content:space-between;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--dim);padding-top:12px;border-top:1px dashed var(--line);text-transform:uppercase;letter-spacing:.1em}
 
-  .flash-up{animation:fu .6s}
-  .flash-dn{animation:fd .6s}
-  @keyframes fu{0%{background:rgba(201,255,59,.22)}}
-  @keyframes fd{0%{background:rgba(255,77,46,.22)}}
+  .floating-note{position:absolute;left:-90px;top:50%;transform:rotate(-90deg);transform-origin:left top;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--dim);letter-spacing:.3em;text-transform:uppercase;white-space:nowrap}
 
-  @media(max-width:860px){
-    body{padding:20px}
-    .summary{grid-template-columns:1fr 1fr}
-    .sumcell{border-right:none;border-bottom:1px solid var(--line)}
-    .hide-sm{display:none}
-    th,td{padding:14px 10px}
+  .strip{border-top:1px solid var(--line);border-bottom:1px solid var(--line);background:var(--acid);color:#000;overflow:hidden;white-space:nowrap;padding:18px 0;font-family:"Fraunces",serif;font-weight:900;font-size:38px;letter-spacing:-.02em}
+  .strip-track{display:inline-block;animation:slide 28s linear infinite;padding-left:100%}
+  .strip span{margin:0 32px}
+  .strip .sep{font-family:"JetBrains Mono",monospace;font-weight:500;font-size:24px;vertical-align:middle}
+
+  .features{padding:120px 32px;border-bottom:1px solid var(--line)}
+  .sec-head{display:grid;grid-template-columns:auto 1fr;gap:80px;margin-bottom:90px}
+  .sec-head .num{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--acid);letter-spacing:.2em;text-transform:uppercase}
+  .sec-head h2{font-family:"Fraunces",serif;font-weight:300;font-size:clamp(42px,5.5vw,78px);line-height:.95;letter-spacing:-.03em;max-width:900px}
+  .sec-head h2 em{font-style:italic;color:var(--acid);font-weight:400}
+
+  .feat-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:0;border-top:1px solid var(--line)}
+  .feat{padding:56px 40px 64px;border-right:1px solid var(--line);border-bottom:1px solid var(--line);position:relative;transition:.4s;cursor:default}
+  .feat:nth-child(3n){border-right:none}
+  .feat:hover{background:rgba(201,255,59,.03)}
+  .feat:hover .feat-num{color:var(--acid)}
+  .feat-num{font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--dim);letter-spacing:.2em;transition:.3s}
+  .feat-icon{margin:30px 0 34px;width:52px;height:52px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;transform:rotate(45deg)}
+  .feat-icon svg{transform:rotate(-45deg)}
+  .feat h3{font-family:"Fraunces",serif;font-weight:400;font-size:30px;letter-spacing:-.015em;line-height:1.1;margin-bottom:16px}
+  .feat p{color:var(--dim);font-size:15px;line-height:1.6;max-width:36ch}
+  .feat .tag{position:absolute;top:56px;right:40px;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--dim);letter-spacing:.15em;text-transform:uppercase}
+
+  .pricing{padding:120px 32px;border-bottom:1px solid var(--line)}
+  .plans{display:grid;grid-template-columns:repeat(3,1fr);gap:24px;margin-top:70px}
+  .plan{border:1px solid var(--line);padding:44px 36px;position:relative;transition:.3s;background:rgba(255,255,255,.01)}
+  .plan:hover{border-color:var(--ink);transform:translateY(-4px)}
+  .plan.hot{border-color:var(--acid);background:linear-gradient(180deg,rgba(201,255,59,.05),transparent 60%)}
+  .plan.hot::before{content:"◆ MOST CIPHERED";position:absolute;top:-11px;left:36px;background:var(--acid);color:#000;font-family:"JetBrains Mono",monospace;font-size:10px;padding:4px 12px;letter-spacing:.15em;font-weight:500}
+  .plan h4{font-family:"Fraunces",serif;font-weight:400;font-size:28px;margin-bottom:6px}
+  .plan .sub{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.12em;margin-bottom:36px}
+  .price{font-family:"Fraunces",serif;font-size:78px;font-weight:300;letter-spacing:-.04em;line-height:1;display:flex;align-items:baseline;gap:6px}
+  .price sup{font-size:22px;font-weight:400;margin-right:2px}
+  .price .per{font-family:"JetBrains Mono",monospace;font-size:11px;color:var(--dim);text-transform:uppercase;letter-spacing:.1em}
+  .plan ul{list-style:none;margin:40px 0;padding:0}
+  .plan li{padding:14px 0;border-bottom:1px solid var(--line);font-size:14px;color:var(--ink);display:flex;gap:12px;align-items:flex-start}
+  .plan li::before{content:"→";color:var(--acid);font-family:"JetBrains Mono",monospace}
+  .plan li.off{color:var(--dim)}
+  .plan li.off::before{content:"×";color:var(--dim)}
+  .plan button{width:100%;padding:16px;background:transparent;border:1px solid var(--ink);color:var(--ink);font-family:"JetBrains Mono",monospace;font-size:12px;text-transform:uppercase;letter-spacing:.12em;cursor:pointer;transition:.2s}
+  .plan button:hover{background:var(--ink);color:#000}
+  .plan.hot button{background:var(--acid);border-color:var(--acid);color:#000;font-weight:500}
+  .plan.hot button:hover{background:#000;color:var(--acid)}
+
+  .band{padding:140px 32px;text-align:center;border-bottom:1px solid var(--line);position:relative;overflow:hidden}
+  .band h3{font-family:"Fraunces",serif;font-weight:300;font-size:clamp(48px,7vw,110px);line-height:.95;letter-spacing:-.035em;max-width:14ch;margin:0 auto}
+  .band h3 em{font-style:italic;font-weight:900}
+  .band h3 .u{color:var(--acid);text-decoration:underline;text-decoration-thickness:2px;text-underline-offset:12px}
+  .band p{color:var(--dim);margin:32px auto 44px;max-width:52ch;font-size:17px;line-height:1.6}
+  .bigmark{position:absolute;font-family:"Fraunces",serif;font-weight:900;font-size:520px;color:rgba(201,255,59,.03);top:-120px;left:50%;transform:translateX(-50%);letter-spacing:-.06em;pointer-events:none;z-index:-1}
+
+  footer{padding:60px 32px 32px;display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:60px}
+  footer .brand p{color:var(--dim);max-width:40ch;margin-top:18px;font-size:14px;line-height:1.5}
+  footer h5{font-family:"JetBrains Mono",monospace;font-size:10px;text-transform:uppercase;letter-spacing:.18em;color:var(--acid);margin-bottom:20px}
+  footer ul{list-style:none}
+  footer li{padding:8px 0;font-size:14px;color:var(--dim)}
+  footer li:hover{color:var(--ink)}
+  .foot-bottom{grid-column:1/-1;display:flex;justify-content:space-between;padding-top:40px;margin-top:40px;border-top:1px solid var(--line);font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.15em}
+
+  .reveal{opacity:0;transform:translateY(30px);animation:rv .9s cubic-bezier(.2,.7,.2,1) forwards}
+  @keyframes rv{to{opacity:1;transform:none}}
+  .d1{animation-delay:.1s}.d2{animation-delay:.25s}.d3{animation-delay:.4s}.d4{animation-delay:.55s}.d5{animation-delay:.7s}.d6{animation-delay:.85s}
+
+  /* modal */
+  .modal-bg{position:fixed;inset:0;background:rgba(5,7,6,.85);backdrop-filter:blur(8px);z-index:100;display:none;align-items:center;justify-content:center;padding:24px;animation:mfade .3s ease}
+  .modal-bg.on{display:flex}
+  @keyframes mfade{from{opacity:0}}
+  .modal{background:var(--bg);border:1px solid var(--acid);max-width:480px;width:100%;padding:44px 40px;position:relative;animation:mpop .4s cubic-bezier(.2,.7,.2,1)}
+  @keyframes mpop{from{transform:translateY(20px);opacity:0}}
+  .modal::before{content:"";position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--acid),transparent)}
+  .modal .x{position:absolute;top:14px;right:18px;background:none;border:none;color:var(--dim);font-size:22px;cursor:pointer;font-family:"JetBrains Mono",monospace}
+  .modal .x:hover{color:var(--acid)}
+  .modal .eyebrow{margin-bottom:18px}
+  .modal h3{font-family:"Fraunces",serif;font-weight:300;font-size:38px;line-height:1;letter-spacing:-.025em;margin-bottom:14px}
+  .modal h3 em{font-style:italic;color:var(--acid);font-weight:400}
+  .modal p{color:var(--dim);font-size:14px;line-height:1.55;margin-bottom:26px}
+  .modal label{display:block;font-family:"JetBrains Mono",monospace;font-size:10px;color:var(--dim);text-transform:uppercase;letter-spacing:.15em;margin-bottom:8px}
+  .modal input,.modal select{width:100%;background:transparent;border:none;border-bottom:1px solid var(--line);padding:10px 0;color:var(--ink);font-family:"JetBrains Mono",monospace;font-size:14px;margin-bottom:22px;outline:none;transition:.2s}
+  .modal input:focus,.modal select:focus{border-color:var(--acid)}
+  .modal select option{background:var(--bg)}
+  .modal .cta-primary{width:100%;margin-top:8px}
+  .modal .ok{text-align:center;padding:20px 0}
+  .modal .ok svg{margin:0 auto 16px;display:block}
+
+  html{scroll-behavior:smooth}
+
+  @media(max-width:960px){
+    .hero{grid-template-columns:1fr}
+    .hero-left{border-right:none;border-bottom:1px solid var(--line);padding:60px 24px}
+    .terminal{padding:36px 24px}
+    .feat-grid{grid-template-columns:1fr}
+    .feat{border-right:none}
+    .plans{grid-template-columns:1fr}
+    footer{grid-template-columns:1fr 1fr;gap:36px}
+    nav ul{display:none}
+    .floating-note{display:none}
   }
 </style>
 </head>
 <body>
-<main>
-  <header>
-    <div class="brand">
-      <div class="mark"></div>
-      <div>
-        <div class="wordmark">CIPHER<span>.</span></div>
-        <div class="tagline">§ Live Market Data</div>
+<div class="grain"></div>
+
+<div class="status">
+  <span><span class="dot"></span> All systems nominal · Latency 12ms</span>
+  <span>SOC 2 Type II · ISO 27001 · MiCA compliant</span>
+  <span>NYC · LDN · SG · 04:17 UTC</span>
+</div>
+
+<div class="ticker">
+  <div class="ticker-track">
+    <span>BTC <b>$104,218.40</b> <em class="up">+2.14%</em></span>
+    <span>ETH <b>$4,092.17</b> <em class="up">+3.01%</em></span>
+    <span>SOL <b>$268.55</b> <em class="dn">−0.84%</em></span>
+    <span>LINK <b>$24.19</b> <em class="up">+1.22%</em></span>
+    <span>AVAX <b>$52.77</b> <em class="up">+4.60%</em></span>
+    <span>DOGE <b>$0.4021</b> <em class="dn">−1.18%</em></span>
+    <span>TON <b>$7.88</b> <em class="up">+0.44%</em></span>
+    <span>DOT <b>$11.05</b> <em class="up">+2.90%</em></span>
+    <span>ARB <b>$1.84</b> <em class="dn">−0.55%</em></span>
+    <span>NEAR <b>$8.12</b> <em class="up">+5.17%</em></span>
+    <span>APT <b>$14.77</b> <em class="up">+1.09%</em></span>
+  </div>
+</div>
+
+<nav>
+  <div class="logo"><span class="mark"></span>CIPHER<span style="color:var(--acid)">.</span></div>
+  <ul>
+    <li><a href="#features">Platform</a></li>
+    <li><a href="#hero">Markets</a></li>
+    <li><a href="#features">Research</a></li>
+    <li><a href="#pricing">Vaults</a></li>
+    <li><a href="#pricing">Docs</a></li>
+  </ul>
+  <button class="cta" data-modal="launch">Launch Terminal →</button>
+</nav>
+
+<section class="hero" id="hero">
+  <div class="hero-left">
+    <div>
+      <div class="eyebrow reveal d1">Vol. 07 · Institutional Intelligence</div>
+      <h1 class="reveal d2">
+        Decode<br>
+        the <em>market's</em><br>
+        <span class="stroke">silence.</span>
+      </h1>
+      <p class="lede reveal d4">
+        Cipher is the <b>quant-grade operating system</b> for digital assets. On-chain forensics, orderbook microstructure, and delta-neutral execution — on a terminal built for traders who read the <b>tape, not the tweets</b>.
+      </p>
+      <div class="hero-actions reveal d5">
+        <button class="cta-primary" data-modal="trial">Start 14-day trial</button>
+        <a class="cta-ghost" href="#" data-modal="demo">Book a demo ↗</a>
       </div>
     </div>
-    <div class="status">
-      <span><span class="dot"></span><span id="src">Connecting…</span></span>
-      <span>Updated <b id="updated">—</b></span>
-      <span id="clock">— UTC</span>
-    </div>
-  </header>
-
-  <div class="title">
-    <h1>The <em>tape,</em><br>decoded.</h1>
-    <p class="sub">Real-time market data for the top digital assets. Prices, 24h change, trading volume, and market capitalization — refreshed every thirty seconds.</p>
-  </div>
-
-  <div class="summary">
-    <div class="sumcell">
-      <div class="lbl">◆ Assets tracked</div>
-      <div class="val" id="sumAssets">—</div>
-    </div>
-    <div class="sumcell">
-      <div class="lbl">◆ Total 24h volume</div>
-      <div class="val" id="sumVol">—</div>
-    </div>
-    <div class="sumcell">
-      <div class="lbl">◆ Total market cap</div>
-      <div class="val" id="sumCap">—</div>
-    </div>
-    <div class="sumcell">
-      <div class="lbl">◆ Market sentiment</div>
-      <div class="val" id="sumSent">—</div>
-      <div class="delta" id="sumSentD"></div>
+    <div class="hero-footnote reveal d6">
+      <div><b>$42B+</b>volume routed</div>
+      <div><b>1,800</b>desks onboarded</div>
+      <div><b>99.996%</b>uptime SLA</div>
     </div>
   </div>
 
-  <div class="table-wrap">
-    <table>
-      <thead>
-        <tr>
-          <th>#</th>
-          <th>Asset</th>
-          <th class="num">Price</th>
-          <th class="num">24h %</th>
-          <th class="num hide-sm">24h Volume</th>
-          <th class="num hide-sm">Market Cap</th>
-          <th class="num hide-sm">7d Trend</th>
-        </tr>
-      </thead>
-      <tbody id="rows">
-        <tr><td colspan="7"><div class="state"><span class="spinner"></span>Fetching market data from Messari…</div></td></tr>
-      </tbody>
-    </table>
+  <div class="terminal">
+    <div class="floating-note">CIPHER · live feed · binance · coinbase · okx</div>
+    <div class="term-head">
+      <span>◉ Live · BTC/USD</span>
+      <span>1D · Candles off</span>
+    </div>
+    <div class="coin">
+      <div><span class="sym">BTC</span><span class="name">Bitcoin</span></div>
+      <div><span class="px">104,218.40</span><span class="ch up">+2.14%</span></div>
+    </div>
+    <div class="chart">
+      <svg viewBox="0 0 500 170" preserveAspectRatio="none">
+        <defs>
+          <linearGradient id="g" x1="0" x2="0" y1="0" y2="1">
+            <stop offset="0%" stop-color="#c9ff3b"/>
+            <stop offset="100%" stop-color="#c9ff3b" stop-opacity="0"/>
+          </linearGradient>
+        </defs>
+        <path class="area" d="M0,120 L20,110 40,118 60,95 80,102 100,85 120,92 140,70 160,78 180,60 200,72 220,55 240,68 260,48 280,62 300,40 320,52 340,35 360,48 380,28 400,42 420,22 440,38 460,18 480,32 500,14 L500,170 L0,170 Z"/>
+        <path class="line" d="M0,120 L20,110 40,118 60,95 80,102 100,85 120,92 140,70 160,78 180,60 200,72 220,55 240,68 260,48 280,62 300,40 320,52 340,35 360,48 380,28 400,42 420,22 440,38 460,18 480,32 500,14"/>
+      </svg>
+    </div>
+    <div class="coin">
+      <div><span class="sym">ETH</span><span class="name">Ethereum</span></div>
+      <div><span class="px">4,092.17</span><span class="ch up">+3.01%</span></div>
+    </div>
+    <div class="coin">
+      <div><span class="sym">SOL</span><span class="name">Solana</span></div>
+      <div><span class="px">268.55</span><span class="ch dn">−0.84%</span></div>
+    </div>
+    <div class="term-foot">
+      <span>◇ 12ms feed</span>
+      <span>24h vol · $94.2B</span>
+      <span>Signals · 7 active</span>
+    </div>
   </div>
+</section>
 
-  <footer>
-    <span>© 2026 Cipher Systems · Data via Messari &amp; CoinGecko</span>
-    <span>Not investment advice · Refreshed every 30s</span>
-  </footer>
-</main>
+<div class="strip">
+  <div class="strip-track">
+    <span>ON-CHAIN FORENSICS</span><span class="sep">✦</span>
+    <span>ORDERBOOK X-RAY</span><span class="sep">✦</span>
+    <span>WHALE TELEMETRY</span><span class="sep">✦</span>
+    <span>DELTA-NEUTRAL VAULTS</span><span class="sep">✦</span>
+    <span>MEV PROTECTION</span><span class="sep">✦</span>
+    <span>INSTITUTIONAL CUSTODY</span><span class="sep">✦</span>
+  </div>
+</div>
+
+<section class="features" id="features">
+  <div class="sec-head">
+    <div class="num">§ 01 / CAPABILITIES</div>
+    <h2>A terminal that reads <em>between</em> the blocks — not just <em>on</em> them.</h2>
+  </div>
+  <div class="feat-grid">
+    <div class="feat">
+      <div class="feat-num">001</div>
+      <div class="tag">/forensics</div>
+      <div class="feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9ff3b" stroke-width="1.5"><circle cx="11" cy="11" r="7"/><path d="M20 20l-4-4"/></svg></div>
+      <h3>Wallet X-Ray</h3>
+      <p>Cluster 340M+ wallets into entities in milliseconds. Surface insider flows hours before they hit the tape.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-num">002</div>
+      <div class="tag">/microstructure</div>
+      <div class="feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9ff3b" stroke-width="1.5"><path d="M3 20V10M9 20V4M15 20V14M21 20V7"/></svg></div>
+      <h3>Orderbook Depth</h3>
+      <p>Real-time L3 data across 47 venues. Spoofing detection, iceberg identification, imbalance alerts.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-num">003</div>
+      <div class="tag">/execution</div>
+      <div class="feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9ff3b" stroke-width="1.5"><path d="M13 2L3 14h8l-1 8 10-12h-8l1-8z"/></svg></div>
+      <h3>Smart Routing</h3>
+      <p>TWAP, VWAP, POV and custom algos across CEX & DEX liquidity. Cut slippage by an average of 38 bps.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-num">004</div>
+      <div class="tag">/signals</div>
+      <div class="feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9ff3b" stroke-width="1.5"><path d="M2 12h4l3-8 4 16 3-8h6"/></svg></div>
+      <h3>Alpha Signals</h3>
+      <p>120+ pre-built factor models — funding skew, CVD divergence, realized vol. Backtest in the browser.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-num">005</div>
+      <div class="tag">/custody</div>
+      <div class="feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9ff3b" stroke-width="1.5"><path d="M12 2l9 4v6c0 5-4 9-9 10-5-1-9-5-9-10V6l9-4z"/></svg></div>
+      <h3>MPC Vaults</h3>
+      <p>Threshold signatures, policy engine, quorum approvals. Insured to $500M through Lloyd's of London.</p>
+    </div>
+    <div class="feat">
+      <div class="feat-num">006</div>
+      <div class="tag">/api</div>
+      <div class="feat-icon"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#c9ff3b" stroke-width="1.5"><path d="M8 3H5a2 2 0 00-2 2v3M16 3h3a2 2 0 012 2v3M8 21H5a2 2 0 01-2-2v-3M16 21h3a2 2 0 002-2v-3"/></svg></div>
+      <h3>Quant API</h3>
+      <p>Stream 9TB/day of normalized data. Python, Rust, Go SDKs. Sub-millisecond WebSocket feeds.</p>
+    </div>
+  </div>
+</section>
+
+<section class="pricing" id="pricing">
+  <div class="sec-head">
+    <div class="num">§ 02 / TERMS</div>
+    <h2>Priced for <em>desks,</em> not degens.</h2>
+  </div>
+  <div class="plans">
+    <div class="plan">
+      <h4>Scout</h4>
+      <div class="sub">// Solo & prop</div>
+      <div class="price"><sup>$</sup>89<span class="per">/ mo</span></div>
+      <ul>
+        <li>Real-time tape & heatmaps</li>
+        <li>15 venues · L2 depth</li>
+        <li>40 alert rules</li>
+        <li>Wallet labelling (1M)</li>
+        <li class="off">Smart order routing</li>
+        <li class="off">MPC vaults</li>
+      </ul>
+      <button data-modal="trial" data-plan="Scout">Start trial</button>
+    </div>
+    <div class="plan hot">
+      <h4>Operator</h4>
+      <div class="sub">// Funds & OTC</div>
+      <div class="price"><sup>$</sup>1,490<span class="per">/ mo</span></div>
+      <ul>
+        <li>Everything in Scout</li>
+        <li>47 venues · full L3</li>
+        <li>Unlimited alerts & backtests</li>
+        <li>Smart routing (TWAP/VWAP/POV)</li>
+        <li>Wallet labelling (340M)</li>
+        <li>Priority execution desk</li>
+      </ul>
+      <button data-modal="demo" data-plan="Operator">Contact sales</button>
+    </div>
+    <div class="plan">
+      <h4>Institution</h4>
+      <div class="sub">// Banks & custodians</div>
+      <div class="price" style="font-size:54px">Bespoke</div>
+      <ul>
+        <li>Everything in Operator</li>
+        <li>Dedicated infrastructure</li>
+        <li>MPC vaults · $500M insured</li>
+        <li>Custom signals & models</li>
+        <li>Regulatory reporting (MiCA)</li>
+        <li>White-glove onboarding</li>
+      </ul>
+      <button data-modal="demo" data-plan="Institution">Arrange briefing</button>
+    </div>
+  </div>
+</section>
+
+<section class="band">
+  <div class="bigmark">✦</div>
+  <h3>The market <em>whispers.</em><br>We hand you the <span class="u">amplifier.</span></h3>
+  <p>Join 1,800 desks that stopped guessing. Fourteen days on the house — no card, no call, no catch.</p>
+  <button class="cta-primary" data-modal="trial">Decrypt the tape →</button>
+</section>
+
+<footer>
+  <div class="brand">
+    <div class="logo"><span class="mark"></span>CIPHER<span style="color:var(--acid)">.</span></div>
+    <p>Institutional-grade crypto intelligence. Built in New York, London and Singapore by engineers from Jane Street, Jump and Chainalysis.</p>
+  </div>
+  <div>
+    <h5>Platform</h5>
+    <ul><li>Terminal</li><li>Signals</li><li>Vaults</li><li>API</li><li>Changelog</li></ul>
+  </div>
+  <div>
+    <h5>Company</h5>
+    <ul><li>Manifesto</li><li>Research</li><li>Careers</li><li>Press</li><li>Contact</li></ul>
+  </div>
+  <div>
+    <h5>Legal</h5>
+    <ul><li>Terms</li><li>Privacy</li><li>SOC 2 report</li><li>Disclosures</li><li>MiCA</li></ul>
+  </div>
+  <div class="foot-bottom">
+    <span>© 2026 Cipher Systems Inc. · Not investment advice</span>
+    <span>Made with ◆ at 04:17 UTC</span>
+  </div>
+</footer>
+
+<div class="modal-bg" id="modalBg">
+  <div class="modal">
+    <button class="x" id="modalClose">✕</button>
+    <div class="eyebrow">◉ <span id="modalKicker">Secure channel</span></div>
+    <h3 id="modalTitle">Open the <em>terminal.</em></h3>
+    <p id="modalSub">We'll provision a sandbox with $1M of paper capital. No card required.</p>
+    <div id="modalForm">
+      <label>Work email</label>
+      <input type="email" id="mEmail" placeholder="you@fund.com" autocomplete="email"/>
+      <label>Desk / firm</label>
+      <input type="text" id="mFirm" placeholder="Acme Capital"/>
+      <label>Use case</label>
+      <select id="mUse">
+        <option>Proprietary trading</option>
+        <option>Market making</option>
+        <option>OTC desk</option>
+        <option>Asset management</option>
+        <option>Research</option>
+      </select>
+      <button class="cta-primary" id="modalSubmit">Transmit →</button>
+    </div>
+    <div class="ok" id="modalOk" style="display:none">
+      <svg width="54" height="54" viewBox="0 0 54 54" fill="none"><circle cx="27" cy="27" r="25" stroke="#c9ff3b" stroke-width="1.5"/><path d="M16 28l8 8 16-18" stroke="#c9ff3b" stroke-width="2" fill="none" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <h3 style="font-size:28px;margin-bottom:10px">Transmission <em>received.</em></h3>
+      <p>Credentials dispatched to your inbox. The tape is waiting.</p>
+    </div>
+  </div>
+</div>
 
 <script>
-const COINS=[
-  {sym:'BTC',  name:'Bitcoin',      cg:'bitcoin'},
-  {sym:'ETH',  name:'Ethereum',     cg:'ethereum'},
-  {sym:'SOL',  name:'Solana',       cg:'solana'},
-  {sym:'BNB',  name:'Binance Coin', cg:'binancecoin'},
-  {sym:'XRP',  name:'XRP',          cg:'ripple'},
-  {sym:'ADA',  name:'Cardano',      cg:'cardano'},
-  {sym:'AVAX', name:'Avalanche',    cg:'avalanche-2'},
-  {sym:'LINK', name:'Chainlink',    cg:'chainlink'},
-  {sym:'DOGE', name:'Dogecoin',     cg:'dogecoin'},
-  {sym:'TON',  name:'Toncoin',      cg:'the-open-network'},
-  {sym:'DOT',  name:'Polkadot',     cg:'polkadot'},
-  {sym:'LTC',  name:'Litecoin',     cg:'litecoin'},
-  {sym:'NEAR', name:'NEAR',         cg:'near'},
-  {sym:'APT',  name:'Aptos',        cg:'aptos'},
-];
-const BY_SYM={}; COINS.forEach((c,i)=>{c.rank=i+1;BY_SYM[c.sym]=c});
-const BY_CG={}; COINS.forEach(c=>BY_CG[c.cg]=c);
-const store={};
+  /* ---------- price flicker ---------- */
+  const pxs=document.querySelectorAll('.coin .px');
+  const base=[104218.40,4092.17,268.55];
+  setInterval(()=>{
+    pxs.forEach((el,i)=>{
+      const d=(Math.random()-.5)*base[i]*0.0008;
+      const v=base[i]+d;
+      el.textContent=v.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
+      el.style.color=d>0?'var(--acid)':'var(--blood)';
+      setTimeout(()=>el.style.color='',400);
+    });
+  },1800);
 
-function fmtPx(n){
-  if(n==null) return '—';
-  if(n>=1000) return '$'+n.toLocaleString('en-US',{minimumFractionDigits:2,maximumFractionDigits:2});
-  if(n>=1) return '$'+n.toFixed(2);
-  return '$'+n.toFixed(4);
-}
-function fmtBig(n){
-  if(n==null||!isFinite(n)) return '—';
-  if(n>=1e12) return '$'+(n/1e12).toFixed(2)+'T';
-  if(n>=1e9)  return '$'+(n/1e9).toFixed(2)+'B';
-  if(n>=1e6)  return '$'+(n/1e6).toFixed(1)+'M';
-  return '$'+n.toFixed(0);
-}
-function fmtPct(n){
-  if(n==null) return '—';
-  return (n>=0?'+':'')+n.toFixed(2)+'%';
-}
-function clockTick(){
-  const d=new Date();
-  const hh=String(d.getUTCHours()).padStart(2,'0');
-  const mm=String(d.getUTCMinutes()).padStart(2,'0');
-  const ss=String(d.getUTCSeconds()).padStart(2,'0');
-  document.getElementById('clock').textContent=`${hh}:${mm}:${ss} UTC`;
-}
-clockTick();setInterval(clockTick,1000);
-
-function sparkPath(values){
-  if(!values||values.length<2) return '';
-  const min=Math.min(...values), max=Math.max(...values);
-  const range=max-min||1;
-  const W=110,H=32;
-  return 'M'+values.map((v,i)=>{
-    const x=(i/(values.length-1))*W;
-    const y=(1-(v-min)/range)*H;
-    return x.toFixed(1)+','+y.toFixed(1);
-  }).join(' L');
-}
-
-function render(){
-  const tbody=document.getElementById('rows');
-  const rows=COINS.map(c=>{
-    const d=store[c.sym];
-    if(!d||d.price==null){
-      return `<tr data-sym="${c.sym}"><td class="rank">${c.rank}</td><td><div class="asset"><div class="coin-ico">${c.sym[0]}</div><div><span class="sym">${c.sym}</span><span class="name">${c.name}</span></div></div></td><td class="num">—</td><td class="num">—</td><td class="num hide-sm">—</td><td class="num hide-sm">—</td><td class="num hide-sm">—</td></tr>`;
-    }
-    const cls=d.change>=0?'up':'dn';
-    const sparkColor=d.change>=0?'var(--acid)':'var(--blood)';
-    const spark=d.spark&&d.spark.length?`<svg class="spark" viewBox="0 0 110 32"><path d="${sparkPath(d.spark)}" stroke="${sparkColor}"/></svg>`:'<span style="color:var(--dim)">—</span>';
-    return `<tr data-sym="${c.sym}">
-      <td class="rank">${c.rank}</td>
-      <td><div class="asset"><div class="coin-ico">${c.sym[0]}</div><div><span class="sym">${c.sym}</span><span class="name">${c.name}</span></div></div></td>
-      <td class="num"><span class="px">${fmtPx(d.price)}</span></td>
-      <td class="num"><span class="ch ${cls}">${fmtPct(d.change)}</span></td>
-      <td class="num hide-sm vol">${fmtBig(d.volume)}</td>
-      <td class="num hide-sm cap">${fmtBig(d.mcap)}</td>
-      <td class="num hide-sm">${spark}</td>
-    </tr>`;
-  }).join('');
-  tbody.innerHTML=rows;
-}
-
-function flashUpdates(prev){
-  COINS.forEach(c=>{
-    const now=store[c.sym]; const was=prev[c.sym];
-    if(!now||!was||now.price===was.price) return;
-    const row=document.querySelector(`tr[data-sym="${c.sym}"]`);
-    if(!row) return;
-    row.classList.remove('flash-up','flash-dn');
-    void row.offsetWidth;
-    row.classList.add(now.price>was.price?'flash-up':'flash-dn');
+  /* ---------- smooth scroll ---------- */
+  document.querySelectorAll('nav a[href^="#"]').forEach(a=>{
+    a.addEventListener('click',e=>{
+      e.preventDefault();
+      const t=document.querySelector(a.getAttribute('href'));
+      if(t) t.scrollIntoView({behavior:'smooth',block:'start'});
+    });
   });
-}
 
-function renderSummary(){
-  const vals=Object.values(store).filter(v=>v.price!=null);
-  if(!vals.length) return;
-  const totalVol=vals.reduce((a,b)=>a+(b.volume||0),0);
-  const totalCap=vals.reduce((a,b)=>a+(b.mcap||0),0);
-  const avgCh=vals.reduce((a,b)=>a+(b.change||0),0)/vals.length;
-  document.getElementById('sumAssets').textContent=vals.length;
-  document.getElementById('sumVol').textContent=fmtBig(totalVol);
-  document.getElementById('sumCap').textContent=fmtBig(totalCap);
-  const sentEl=document.getElementById('sumSent');
-  const sentD=document.getElementById('sumSentD');
-  sentEl.textContent=avgCh>=0?'Bullish':'Bearish';
-  sentEl.style.color=avgCh>=0?'var(--acid)':'var(--blood)';
-  sentD.textContent=`avg ${fmtPct(avgCh)} · 24h`;
-  sentD.style.color=avgCh>=0?'var(--acid)':'var(--blood)';
-}
+  /* ---------- modal ---------- */
+  const modalBg=document.getElementById('modalBg');
+  const modalTitle=document.getElementById('modalTitle');
+  const modalSub=document.getElementById('modalSub');
+  const modalKicker=document.getElementById('modalKicker');
+  const modalForm=document.getElementById('modalForm');
+  const modalOk=document.getElementById('modalOk');
 
-function stamp(){
-  const d=new Date();
-  document.getElementById('updated').textContent=
-    String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0')+':'+String(d.getSeconds()).padStart(2,'0');
-}
+  const modalCopy={
+    launch:{k:'Terminal access',t:'Open the <em>terminal.</em>',s:"We'll provision a sandbox with $1M of paper capital. No card required."},
+    trial: {k:'14-day free trial',t:'Start your <em>trial.</em>',s:'Full access for 14 days. No card, no call, no catch — cancel with one click.'},
+    demo:  {k:'Private briefing',t:'Book a <em>demo.</em>',s:'45 minutes with a solutions engineer. Tailored to your desk, under NDA.'}
+  };
 
-async function fetchCoinGecko(){
-  const ids=COINS.map(c=>c.cg).join(',');
-  const url=`https://api.coingecko.com/api/v3/coins/markets?vs_currency=usd&ids=${ids}&price_change_percentage=24h&sparkline=true`;
-  const r=await fetch(url);
-  if(!r.ok) throw new Error('CoinGecko HTTP '+r.status);
-  const data=await r.json();
-  if(!Array.isArray(data)||!data.length) throw new Error('CoinGecko: empty response');
-  data.forEach(d=>{
-    const c=BY_CG[d.id]; if(!c) return;
-    store[c.sym]={
-      ...(store[c.sym]||{}),
-      price:d.current_price,
-      change:d.price_change_percentage_24h||0,
-      volume:d.total_volume||0,
-      mcap:d.market_cap||0,
-      spark:d.sparkline_in_7d&&d.sparkline_in_7d.price,
-    };
+  function openModal(kind,plan){
+    const c=modalCopy[kind]||modalCopy.launch;
+    modalKicker.textContent=plan?`${c.k} · ${plan} plan`:c.k;
+    modalTitle.innerHTML=c.t;
+    modalSub.textContent=c.s;
+    modalForm.style.display='';
+    modalOk.style.display='none';
+    modalBg.classList.add('on');
+    setTimeout(()=>document.getElementById('mEmail').focus(),100);
+  }
+  function closeModal(){modalBg.classList.remove('on')}
+
+  document.querySelectorAll('[data-modal]').forEach(b=>{
+    b.addEventListener('click',e=>{
+      e.preventDefault();
+      openModal(b.dataset.modal,b.dataset.plan);
+    });
   });
-  return 'CoinGecko';
-}
+  document.getElementById('modalClose').addEventListener('click',closeModal);
+  modalBg.addEventListener('click',e=>{if(e.target===modalBg)closeModal()});
+  document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal()});
 
-async function fetchCoinCap(){
-  const ids=COINS.map(c=>c.cg).join(',');
-  const url=`https://api.coincap.io/v2/assets?ids=${ids}&limit=50`;
-  const r=await fetch(url);
-  if(!r.ok) throw new Error('CoinCap HTTP '+r.status);
-  const j=await r.json();
-  const data=j.data||[];
-  if(!data.length) throw new Error('CoinCap: empty response');
-  data.forEach(d=>{
-    const c=BY_CG[d.id]; if(!c) return;
-    store[c.sym]={
-      ...(store[c.sym]||{}),
-      price:parseFloat(d.priceUsd),
-      change:parseFloat(d.changePercent24Hr)||0,
-      volume:parseFloat(d.volumeUsd24Hr)||0,
-      mcap:parseFloat(d.marketCapUsd)||0,
-    };
-  });
-  return 'CoinCap';
-}
-
-let lastError='';
-async function refresh(){
-  const prev=JSON.parse(JSON.stringify(store));
-  let src=null;
-  const errs=[];
-
-  try{
-    src=await fetchCoinGecko();
-  }catch(e){
-    errs.push('CoinGecko: '+e.message);
-    console.warn(e);
-  }
-
-  if(!src){
-    try{
-      src=await fetchCoinCap();
-    }catch(e){
-      errs.push('CoinCap: '+e.message);
-      console.warn(e);
-    }
-  }
-
-  if(!src){
-    lastError=errs.join(' · ');
-    document.getElementById('src').textContent='Offline · retry 30s';
-    if(!Object.values(store).some(v=>v.price!=null)){
-      document.getElementById('rows').innerHTML=`<tr><td colspan="7"><div class="state err">✕ Unable to reach market data APIs.<br><br><span style="color:var(--dim);font-size:11px">${lastError||'Network error'}</span><br><br>Retrying in 30 seconds…</div></td></tr>`;
-    }
-    return;
-  }
-
-  document.getElementById('src').textContent='Live · '+src;
-  render();
-  renderSummary();
-  stamp();
-  flashUpdates(prev);
-}
-      if(!Object.keys(store).length){
-        document.getElementById('rows').innerHTML=`<tr><td colspan="7"><div class="state err">✕ Unable to reach market data APIs.<br><br>Retrying in 30 seconds…</div></td></tr>`;
-      }
+  document.getElementById('modalSubmit').addEventListener('click',()=>{
+    const em=document.getElementById('mEmail').value.trim();
+    if(!em||!em.includes('@')){
+      const i=document.getElementById('mEmail');
+      i.style.borderColor='var(--blood)';
+      setTimeout(()=>i.style.borderColor='',1500);
       return;
     }
-  }
-
-  document.getElementById('src').textContent='Live · '+src;
-  render();
-  renderSummary();
-  stamp();
-  flashUpdates(prev);
-}
-
-refresh();
-setInterval(refresh,30000);
+    modalForm.style.display='none';
+    modalOk.style.display='';
+  });
 </script>
 </body>
 </html>
